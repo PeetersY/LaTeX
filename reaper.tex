@@ -1,0 +1,810 @@
+\documentclass[DIV=calc]{scrartcl}
+\usepackage[dutch]{babel} %Nederlandse splitsing en titels
+\usepackage{mathpazo} %gebruikt palatino, ook in wiskundige formules
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{beramono} %gebruik beramono voor bvb. computercode
+\linespread{1.04} %palatino is iets vetter, dus meer ruimte tussen regels
+\usepackage[latin1]{inputenc} %letters met accenten eenvoudig gebruiken        
+\usepackage[small,bf,hang]{caption} %mooiere bijschriften bij figuren en tabellen
+\usepackage{url} %Webadressen gemakkelijk invoeren
+\usepackage{graphicx} %figuren invoegen (pdf, png en jpg)
+\usepackage{multirow}
+\usepackage{array} %nodig voor mooie vierkanten
+ \usepackage{calc}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{listings} %nodig voor scilabcode
+\definecolor{grijs}{rgb}{0.9,0.9,0.9} %maak lichter grijs door 3 getallen groter te maken 
+\usepackage{microtype} %enkele details qua typografie zodat er minder woordsplitsingen nodig zijn
+%\usepackage[fixlanguage]{babelbib} %bibliografie aangepast aan taal
+%\selectbiblanguage{dutch}
+\usepackage{hyperref} %alle verwijzingen en inhoudsopgave klikbaar in PDF
+\setkomafont{sectioning}{\rmfamily\bfseries\boldmath} %gewoon palatino in sectietitels enz...
+\setkomafont{descriptionlabel}{\rmfamily\bfseries}
+%\bibliographystyle{babunsrt}
+
+%%%% onderstaande code is nodig om mooie vierkanten te kunnen maken
+%%%% Er wordt een nieuwe environment squarecells gedefinieerd.
+\newlength\celldim \newlength\fontheight \newlength\extraheight
+\newcounter{sqcolumns}
+
+\newcolumntype{S}{ @{}
+  >{\centering \rule[-0.5\extraheight]{0pt}{\fontheight + \extraheight}}
+  p{\celldim} @{} }
+
+\newcolumntype{Z}{ @{} >{\centering} p{\celldim} @{} }
+
+\newenvironment{squarecells}[1]
+  {\setlength\celldim{2em}%
+   \settoheight\fontheight{A}%
+   \setlength\extraheight{\celldim - \fontheight}%
+   \setcounter{sqcolumns}{#1 - 1}%
+   \begin{tabular}{|S|*{\value{sqcolumns}}{Z|}}\hline}
+% squarecells tabular goes here
+  {\end{tabular}}
+
+\newcommand\nl{\tabularnewline\hline}
+
+\lstset{language=Scilab,basicstyle=\ttfamily \footnotesize,backgroundcolor=\color{grijs},
+framerule=0.5pt,tabsize=2}
+\lstdefinestyle{inline} {basicstyle=\normalsize \ttfamily}
+
+\frenchspacing
+
+
+
+%%%%%%%%%%%%%%%%%% Vanaf hier begin het document en mag je aanpassingen maken %%%%%%%%
+
+\begin{document}
+\noindent  \begin{tabular}{ll} 
+\multirow{4}{4.5cm}[0mm]{\includegraphics[width=4.5cm]{NieuwLogoGT.pdf} \hfill}
+& Maarten Peeters \\
+& Ego Vanautgaerden \\
+& Yannick Peeters \\
+& 3 Ti  \\
+& 8 maart 2013 \\
+\end{tabular}
+\vspace{0.5cm}
+
+\begin{center}
+\Large \textsc{Afstudeerproject
+Systeem- en Netwerkbeheer: Reaper} 
+\end{center}
+
+%\noindent \rule{\textwidth}{0.5pt}
+\vspace{0.5cm}
+\tableofcontents
+
+
+\newpage
+\section{Idee}
+Reaper Digital Audio Workstation(DAW) voorbereiden op gebruik in een klaslokaal.\\
+Dit houdt in dat de software op de machines waar de studenten op werken draait en de plugins (de programaatjes die de verwerking van audio doen) te laten draaien op bepaalde servers in een rack.\\
+De bedoeling is dat de clients (werkplaatsen studenten) Windows of OSX draaien en de servers Windows of Linux draaien.\\
+Hiervoor moeten er scripts geschreven worden die de installatie vergemakkelijken en extra functionaliteit toevoegen (visuele processor verbruik).
+\section{Werkverdeling}
+\subsection{Ego Vanautgaerden}
+\begin{itemize}
+		\item Projectleider
+		\item Benchmarking
+		\item Pxe
+		\item Linux Installatiescripts
+		\item Python scripting (problemen verhelpen)
+		\item How to: Linux
+	\end{itemize}
+\subsection{Maarten Peeters}
+\begin{itemize}
+	\item Benchmarking
+	\item Python scripting
+	\item Psutil
+	\item How to: Windows(finale versie)
+\end{itemize}
+\subsection{Yannick Peeters}
+\begin{itemize}
+	\item Benchmarking
+	\item Windows installatiescript
+	\item Python scripting (meewerken aan UI)
+	\item How to: Windows (eerste versie)
+	\item Verslag in LaTeX
+\end{itemize}
+\section{Problemen en oplossingen}
+
+\begin{enumerate}
+	\item Kan niets uploaden naar de wiki => webontwerp te weinig ruimte voor onze bestanden.
+	\begin{itemize}
+		\item tijdelijke oplossing, uploaden naar iemand zijn eigen webpagina
+		\item whoehoe uploaden bash scripts work
+	\end{itemize}
+	\item psutil voor de python scripts, installatie was problematisch, heeft 2 uur geduurd op windows en 1 uur op linux
+	\begin{itemize}
+		\item opgelost
+	\end{itemize}
+	\item windows batch files zijn vreselijk gelimiteerd in hun kunnen (kan niet automatisch downloaden naar een vaste folder, kan geen zips unzippen (really Bill Gates?)
+		\begin{itemize}
+		\item unzipper.exe downloaden en gebruiken om de zips te unzippen
+	\end{itemize}
+	\item problemen met linux wine installaties vanaf command line
+	\begin{itemize}
+		\item probleem opgelost door de exe's niet direct na installatie te verwijderen en wineconf niet uit te voeren
+	\end{itemize}
+	\item problemen python ui => is een non threaded stuk waardoor de ui niet wilt updaten
+	\begin{itemize}
+		\item Gedeeltelijk opgelost. De UI ontvangt de updates, maar de volgorde is willekeurig. Vandaar dat meerdere servers niet gescheiden werden.
+	\end{itemize}
+	\item instellen van headless server, reamote gebruikt een ui
+	\begin{itemize}
+		\item x window server instaleren. Deze oplossing was niet ideaal.
+	\end{itemize}
+	\item Pxe images maken van live cd's
+	\begin{itemize}
+		\item Fedora heeft een package livecd-tools waar een functie in zit livecd-iso-to-pxe die een compleete pxe map aanmaakt van een gegeven iso file
+	\end{itemize}
+	\item Damn small linux heeft een verouderde kernel waardoor de onboard netwerkaarten niet werken op de desktops in het school
+	\begin{itemize}
+		\item drbl uitproberen
+	\end{itemize}
+	\item Wine installatie zorgt er voor dat live images compleet crashen
+	\begin{itemize}
+		\item Geen live image gebruiken
+	\end{itemize}
+	\item MSI installeert de exe's niet, hij plaatst ze gewoon op de schijf
+	\begin{itemize}
+		\item oude batch files blijven onze eerste installatie wegens falende msi install
+	\end{itemize}
+	\item wiki staat nog steeeds niet toe om bepaalde dingen up te loaden (ask Geens)
+	\begin{itemize}
+		\item We hebben de scripts in een zip gestoken en deze zo ge\"upload.
+		\item Sinds 06/03 kunnen we ook .bat en .py bestanden uploaden, hierdoor is alles ge\"upload
+	\end{itemize}
+\end{enumerate}
+\section{Documentatie}
+\subsection{How to: Linux}
+De how to vind je terug op \\
+\url{http://wikis.khleuven.be/sysnw/index.php/Reaper#How_To} \\met als naam: "Media:how-to-reaper-lin.pdf"
+\subsection{How to: Windows}
+De how to vind je terug op \\
+\url{http://wikis.khleuven.be/sysnw/index.php/Reaper#How_To} \\met als naam: "Media:how-to-reaper-win.pdf"
+\pagebreak
+\section{Scripts}
+\subsection{Linux installatiescripts}
+\subsubsection{Debian - \textit{unstable}}
+\begin{lstlisting}[caption={Script-debian-32bit.sh}, label=Debian installatiescript 32bit]
+#installatie wget && gcc
+apt-get install wget
+apt-get install gcc
+apt-get install tkinter
+ 
+#downloaden en installeren reaper
+winecfg
+wget -O /tmp/install.exe http://reaper.fm/files/4.x/reaper432-install.exe
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/8/86/Pref-linux-server.
+ReaperConfigZip --no-check-certificate
+chmod 666 /tmp/Pref-linux-server.ReaperConfigZip
+wine /tmp/install.exe
+ 
+#downloaden en installeren psutil
+apt-get install python-dev
+wget -O /tmp/psutil.tar.gz 
+http://psutil.googlecode.com/files/psutil-0.6.1.tar.gz
+cd /tmp
+tar -xzf /tmp/psutil.tar.gz
+cd psutil-0.6.1
+sudo python setup.py install
+ 
+#downloaden VSTplugins
+wget -O /tmp/vst.tar.gz www.peetersy.be/reaper/VST_plugins.tar.gz
+cd /tmp
+tar -xzf /tmp/vst.tar.gz
+cp -r /tmp/VST\ plugins/ /home/$SUDO_USER/.wine/drive_c
+chmod -R 777 /home/$SUDO_USER/.wine/drive_c/VST\ plugins
+ 
+#iptables instellen om reamote toe te staan
+iptables -I INPUT -p tcp --dport 45820 --syn -j ACCEPT
+iptables -I INPUT -p udp --dport 45820 -j ACCEPT
+ 
+#downloaden python scripts
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/9/99/Server_scripts.tar.gz 
+--no-check-certificate
+tar -xzf /tmp/Server_scripts.tar.gz
+ 
+#cleanup
+rm /tmp/install.exe
+rm /tmp/psutil.tar.gz
+rm -r /tmp/psutil-0.6.1
+rm /tmp/vst.tar.gz
+rm -r /tmp/VST\ plugins
+\end{lstlisting}
+\begin{lstlisting}[caption={Script-debian-64bit.sh}, label=Debian installatiescript 64bit]
+#installatie wget && gcc
+apt-get install wget
+apt-get install gcc
+apt-get install tkinter
+ 
+#downloaden en installeren reaper
+winecfg
+wget -O /tmp/install.exe 
+http://reaper.fm/files/4.x/reaper432_x64-install.exe
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/8/86/Pref-linux-server.
+ReaperConfigZip --no-check-certificate
+chmod 666 /tmp/Pref-linux-server.ReaperConfigZip
+wine /tmp/install.exe
+ 
+#downloaden en installeren psutil
+apt-get install python-dev
+wget -O /tmp/psutil.tar.gz 
+http://psutil.googlecode.com/files/psutil-0.6.1.tar.gz
+cd /tmp
+tar -xzf /tmp/psutil.tar.gz
+cd psutil-0.6.1
+sudo python setup.py install
+ 
+#downloaden VSTplugins
+wget -O /tmp/vst.tar.gz www.peetersy.be/reaper/VST_plugins.tar.gz
+cd /tmp
+tar -xzf /tmp/vst.tar.gz
+cp -r /tmp/VST\ plugins/ /home/$SUDO_USER/.wine/drive_c
+chmod -R 777 /home/$SUDO_USER/.wine/drive_c/VST\ plugins
+ 
+#iptables instellen om reamote toe te staan
+iptables -I INPUT -p tcp --dport 45820 --syn -j ACCEPT
+iptables -I INPUT -p udp --dport 45820 -j ACCEPT
+ 
+#downloaden python scripts
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/9/99/Server_scripts.tar.gz 
+--no-check-certificate
+tar -xzf /tmp/Server_scripts.tar.gz
+ 
+#cleanup
+rm /tmp/install.exe
+rm /tmp/psutil.tar.gz
+rm -r /tmp/psutil-0.6.1
+rm /tmp/vst.tar.gz
+rm -r /tmp/VST\ plugins
+\end{lstlisting}
+
+
+
+
+\subsubsection{Fedora}
+\begin{lstlisting}[caption={Script-fedora-32bit.sh}, label=Fedora installatiescript 32bit]
+#installatie wget && gcc
+yum install wget
+yum install gcc
+yum install tkinter
+ 
+#downloaden en installeren reaper
+winecfg
+wget -O /tmp/install.exe http://reaper.fm/files/4.x/reaper432-install.exe
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/8/86/Pref-linux-server.
+ReaperConfigZip --no-check-certificate
+chmod 666 /tmp/Pref-linux-server.ReaperConfigZip
+wine /tmp/install.exe
+ 
+#downloaden en installeren psutil
+yum install python-devel
+wget -O /tmp/psutil.tar.gz 
+http://psutil.googlecode.com/files/psutil-0.6.1.tar.gz
+cd /tmp
+tar -xzf /tmp/psutil.tar.gz
+cd psutil-0.6.1
+sudo python setup.py install
+ 
+#downloaden VSTplugins
+wget -O /tmp/vst.tar.gz www.peetersy.be/reaper/VST_plugins.tar.gz
+cd /tmp
+tar -xzf /tmp/vst.tar.gz
+cp -r /tmp/VST\ plugins/ /home/$SUDO_USER/.wine/drive_c
+chmod -R 777 /home/$SUDO_USER/.wine/drive_c/VST\ plugins
+ 
+#iptables instellen om reamote toe te staan
+iptables -I INPUT -p tcp --dport 45820 --syn -j ACCEPT
+iptables -I INPUT -p udp --dport 45820 -j ACCEPT
+service iptables save
+ 
+#downloaden python scripts
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/9/99/Server_scripts.tar.gz 
+--no-check-certificate
+tar -xzf /tmp/Server_scripts.tar.gz
+ 
+#cleanup
+rm /tmp/install.exe
+rm /tmp/psutil.tar.gz
+rm -r /tmp/psutil-0.6.1
+rm /tmp/vst.tar.gz
+rm -r /tmp/VST\ plugins
+\end{lstlisting}
+\begin{lstlisting}[caption={Script-fedora-64bit.sh}, label=Fedora installatiescript 64bit]
+#installatie wget && gcc
+yum install wget
+yum install gcc
+yum install tkinter
+ 
+#downloaden en installeren reaper
+winecfg
+wget -O /tmp/install.exe 
+http://reaper.fm/files/4.x/reaper432_x64-install.exe
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/8/86/Pref-linux-server.
+ReaperConfigZip --no-check-certificate
+chmod 666 /tmp/Pref-linux-server.ReaperConfigZip
+wine /tmp/install.exe
+ 
+#downloaden en installeren psutil
+yum install python-devel
+wget -O /tmp/psutil.tar.gz 
+http://psutil.googlecode.com/files/psutil-0.6.1.tar.gz
+cd /tmp
+tar -xzf /tmp/psutil.tar.gz
+cd psutil-0.6.1
+sudo python setup.py install
+ 
+#downloaden VSTplugins
+wget -O /tmp/vst.tar.gz www.peetersy.be/reaper/VST_plugins.tar.gz
+cd /tmp
+tar -xzf /tmp/vst.tar.gz
+cp -r /tmp/VST\ plugins/ /home/$SUDO_USER/.wine/drive_c
+chmod -R 777 /home/$SUDO_USER/.wine/drive_c/VST\ plugins
+ 
+#iptables instellen om reamote toe te staan
+iptables -I INPUT -p tcp --dport 45820 --syn -j ACCEPT
+iptables -I INPUT -p udp --dport 45820 -j ACCEPT
+service iptables save
+ 
+#downloaden python scripts
+cd /tmp
+wget https://wikis.khleuven.be/sysnw/images/9/99/Server_scripts.tar.gz 
+--no-check-certificate
+tar -xzf /tmp/Server_scripts.tar.gz
+ 
+#cleanup
+rm /tmp/install.exe
+rm /tmp/psutil.tar.gz
+rm -r /tmp/psutil-0.6.1
+rm /tmp/vst.tar.gz
+rm -r /tmp/VST\ plugins
+\end{lstlisting}
+\subsection{Windows installatiescripts}
+\begin{lstlisting}[caption={reaper.bat}, label=Windows installatiescript 32bit]
+@echo off
+echo Bewaar de startende downloads in C:\Temp zonder de namen te wijzigen, 
+anders zal dit niet werken!
+PAUSE
+mkdir C:\Temp
+cd C:\Temp
+echo Download Python (nodig voor reaper)
+start http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi
+PAUSE
+echo druk op een toets om de Reaper te downloaden.
+PAUSE
+start http://reaper.fm/files/4.x/reaper432-install.exe
+PAUSE
+echo druk op een toets om de SWS extensie te downloaden
+start http://www.standingwaterstudios.com/reaper/sws_extension.exe
+PAUSE
+echo druk op een toets om PSUtil te downloaden
+start http://psutil.googlecode.com/files/psutil-0.6.1.win32-py2.7.exe
+PAUSE
+echo unzipper downloaden
+start http://stahlforce.com/dev/unzip.exe
+PAUSE
+echo druk op een toets om de plugins te downloaden
+start http://www.peetersy.be/reaper/VST_plugins.zip
+PAUSE
+echo druk op een toets om de python scripts te downloaden
+start http://wikis.khleuven.be/sysnw/images/d/de/Client_scripts.zip
+PAUSE
+echo druk op een toets om python te installeren
+start python-2.7.3.msi
+PAUSE
+echo druk op een toets om reaper te installeren
+start reaper432-install.exe
+PAUSE
+echo druk op een toets om SWS extensie te installeren
+start sws_extension.exe
+PAUSE
+echo druk op een toets om PSUtil te installeren
+start psutil-0.6.1.win32-py2.7.exe
+PAUSE
+echo druk op een toets om de plugins te installeren
+unzip.exe -d C:\Temp\plugins VST_plugins
+unzip.exe -d C:\Temp\client_scripts Client_scripts
+mkdir "%userprofile%\Desktop\Python Scripts Reaper"
+XCOPY "C:\Temp\client_scripts" 
+"%userprofile%\Desktop\Python Scripts Reaper" /S /Y
+mkdir C:\VST_Plugins
+XCOPY "C:\Temp\plugins\VST plugins" C:\VST_plugins /S /Y
+echo even de tijdelijke bestanden opkuisen, 
+gelieve dus J te antwoorden op de volgende vraag.
+cd C:\
+RD C:\Temp\ /S
+\end{lstlisting}
+\begin{lstlisting}[caption={reaper64.bat}, label=Windows installatiescript 64bit]
+@echo off
+echo Bewaar de startende downloads in C:\Temp zonder de namen te wijzigen, 
+anders zal dit niet werken!
+PAUSE
+mkdir C:\Temp
+cd C:\Temp
+echo Download Python (nodig voor reaper)
+start http://www.python.org/ftp/python/2.7.3/python-2.7.3.amd64.msi
+PAUSE
+echo druk op een toets om de Reaper te downloaden.
+PAUSE
+start http://www.reaper.fm/files/4.x/reaper432_x64-install.exe
+PAUSE
+echo druk op een toets om de SWS extensie te downloaden
+start http://www.standingwaterstudios.com/reaper/sws_extension_x64.exe
+PAUSE
+echo druk op een toets om PSUtil te downloaden
+start http://psutil.googlecode.com/files/psutil-0.6.1.win-amd64-py2.7.exe
+PAUSE
+echo unzipper downloaden
+start http://stahlforce.com/dev/unzip.exe
+PAUSE
+echo druk op een toets om de plugins te downloaden
+start http://www.peetersy.be/reaper/VST_plugins.zip
+PAUSE
+echo druk op een toets om de python scripts te downloaden
+start http://wikis.khleuven.be/sysnw/images/d/de/Client_scripts.zip
+PAUSE
+echo druk op een toets om python te installeren
+start python-2.7.3.amd64.msi
+PAUSE
+echo druk op een toets om reaper te installeren
+start reaper432_x64-install.exe
+PAUSE
+echo druk op een toets om SWS extensie te installeren
+start sws_extension_x64.exe
+PAUSE
+echo druk op een toets om PSUtil te installeren
+start psutil-0.6.1.win-amd64-py2.7.exe
+PAUSE
+echo druk op een toets om de plugins te installeren
+unzip.exe -d C:\Temp\plugins VST_plugins
+unzip.exe -d C:\Temp\client_scripts Client_scripts
+mkdir "%userprofile%\Desktop\Python Scripts Reaper"
+XCOPY "C:\Temp\client_scripts" 
+"%userprofile%\Desktop\Python Scripts Reaper" /S /Y
+mkdir C:\VST_Plugins
+XCOPY "C:\Temp\plugins\VST plugins" C:\VST_plugins /S /Y
+echo even de tijdelijke bestanden opkuisen, 
+gelieve dus J te antwoorden op de volgende vraag.
+cd C:\
+RD C:\Temp\ /S
+\end{lstlisting}
+
+\subsection{Python scripts}
+\begin{lstlisting}[caption={cputest.py}, label=Processor- en geheugengebruik opvragen van pc]
+import psutil
+class Usage:
+    def __init__(self): pass
+ 
+    def ask_cpu(self):
+        return str(psutil.cpu_percent(interval=0.1, percpu = False))
+ 
+    def ask_cpu_spec(self, process):
+        pname = process
+        for p in psutil.process_iter():
+            if p.name == pname:
+                return str(round(p.get_cpu_percent(interval = 0.1,),2))
+ 
+    def ask_ram(self):
+        return str(psutil.virtual_memory().percent)
+ 
+    def ask_ram_spec(self, process):
+        pname = process
+        for p in psutil.process_iter():
+            if p.name == pname:
+                return str(round(p.get_memory_percent(),1))
+ 
+    def ask_num_proc(self):
+        return psutil.NUM_CPUS
+\end{lstlisting}
+\begin{lstlisting}[caption={broadcast\_send.py}, label=Server laten broadcasten op bepaalde poort]
+MYPORT = 50000
+ 
+import sys, time
+from socket import *
+ 
+class Caster:
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.bind(('', 0))
+    s.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+ 
+    def send(self,text):
+        data = repr(text)
+        self.s.sendto(data, ('<broadcast>', MYPORT))
+\end{lstlisting}
+\begin{lstlisting}[caption={launcher.py}, label=launcher langs serverzijde]
+class Launcher:
+    from broadcast_send import Caster
+    from cputest import Usage
+    import time
+ 
+    use = Usage()
+    bsen = Caster()
+ 
+    while(1):
+        try:
+            bsen.send("cpu-reaper: " + use.ask_cpu_spec("reamote.exe"))
+            bsen.send("ram-reaper: " + use.ask_ram_spec("reamote.exe"))  
+            bsen.send("cpu: " + use.ask_cpu())
+            bsen.send("ram: " + use.ask_ram())
+            bsen.send("cores: " + str(use.ask_num_proc()))
+            time.sleep(1)
+        except(TypeError):
+            time.sleep(1)
+            print "Staat reamote wel op?"
+\end{lstlisting}
+\begin{lstlisting}[caption={launcher\_rec.py}, label=launcher langs clientzijde]
+from buffer import Buff
+ 
+b = Buff()
+b.voerUit()
+\end{lstlisting}
+\begin{lstlisting}[caption={buffer.py}, label=Threads laten starten van een functie van de Receiver en een functie van de MainFrame]
+from broadcast_receive import Receiver
+from pythonUI import MainFrame
+import thread
+ 
+class Buff:
+    a = Receiver()
+    m = MainFrame()
+    m.addrec(a)
+ 
+    def __init__(self):
+        thread.start_new_thread(self.a.run,())
+        thread.start_new_thread(self.m.werk,())
+ 
+    def voerUit(self):
+        t1 = thread(target = self.a.run())
+        t2 = thread(target = self.m.werk())
+        t1.start()
+        t2.start()
+        t1.join()
+        t2.join()
+\end{lstlisting}
+\begin{lstlisting}[caption={pyhtonUI.py}, label=UI van het processor- en geheugengebruik van de server]
+from Tkinter import *
+ 
+class MainFrame:    
+    bgcolor = '#321000'
+    fgcolor = '#000fff000'
+    f = 12
+    m = 0
+    h = 0
+    rcv = 0
+    root = Tk()
+    root.geometry('290x150+120+120')
+    root.wm_title('Processor and Memory Usage')
+    root.configure(background= bgcolor)
+    cpugrid = StringVar()
+    ramgrid = StringVar()
+    cpureapergrid = StringVar()
+    ramreapergrid = StringVar()
+    coresgrid = StringVar()
+    runtimegrid = StringVar()
+ 
+    label1 = Label(root,textvariable=cpugrid,bg= bgcolor,
+		fg= fgcolor,font=("Helvetica",f))
+    label2 = Label(root,textvariable=ramgrid,bg= bgcolor,
+		fg= fgcolor,font=("Helvetica",f))
+    label3 = Label(root,textvariable=cpureapergrid,bg= bgcolor,
+		fg= fgcolor,font=("Helvetica",f))
+    label4 = Label(root,textvariable=ramreapergrid,bg= bgcolor,
+		fg= fgcolor,font=("Helvetica",f))
+    label5 = Label(root,textvariable=coresgrid,bg= bgcolor,
+		fg= fgcolor,font=("Helvetica",f))
+    label6 = Label(root,textvariable=runtimegrid,bg= bgcolor,
+		fg= fgcolor,font=("Helvetica",f))
+ 
+    label1.grid(sticky=W)
+    label2.grid(sticky=W)
+    label3.grid(sticky=W)
+    label4.grid(sticky=W)
+    label5.grid(sticky=W)
+    label6.grid(sticky=W)
+ 
+ 
+    def __init__(self):
+        self.cpugrid.set("CPU Usage:" + " " + str(0) + "%")
+        self.ramgrid.set("RAM Usage:" + " " + str(0) + "%")
+        self.cpureapergrid.set("CPU-REAPER Usage:" + " " + str(0) + "%")
+        self.ramreapergrid.set("RAM-REAPER Usage:" + " " + str(0) + "%")
+        self.coresgrid.set("CORES:" + " " + str(0) + "%")
+ 
+    def addrec(self, rec):
+        self.rcv = rec
+ 
+def DoeIets(self,n, master):       
+        self.root.wm_title(self.rcv.getAddr())
+        self.cpugrid.set("CPU Usage:" + " " + self.rcv.getCpu() + "%")
+        self.ramgrid.set("RAM Usage:" + " " + self.rcv.getRam() + "%")
+        self.cpureapergrid.set("CPU-REAPER Usage: " 
+				+ self.rcv.getCpuReaper() + "%")
+        self.ramreapergrid.set("RAM-REAPER Usage: " 
+				+ self.rcv.getRamReaper() + "%")
+        self.coresgrid.set("CORES:" + " " + self.rcv.getCores())
+ 
+        if(self.h>0):
+            self.runtimegrid.set(str(self.h) + " hours " 
+						+ str(self.m) + " minutes " + str(n) + " seconds running")
+ 
+        elif(self.m>0):
+            self.runtimegrid.set(str(self.m) + " minutes " 
+						+ str(n) + " seconds running")
+ 
+        else:
+            self.runtimegrid.set(str(n) + " seconds running")
+ 
+        n += 1
+        if (n == 60):
+            n -= 60
+            self.m += 1
+ 
+        if (self.m == 60):
+            self.m -= 60
+            self.h += 1
+ 
+        if n >=0 :
+            self.root.after(1000, self.DoeIets, n, master)
+ 
+    def werk(self):       
+        self.DoeIets(0, self.root)
+        self.root.mainloop()
+\end{lstlisting}
+\begin{lstlisting}[caption={broadcast\_recieve.py}, label=luister op poort en ontvangt data]
+import socket, traceback
+  
+class Receiver:
+ 
+    adresses = []
+    cpu = "0"
+    ram = "0"
+    cpureaper = "0"
+    ramreaper = "0"
+    cores = "0"
+    addr = "Processor and Memory Usage"
+ 
+    def __init__(self):
+        host = ''                               # Bind to all interfaces
+        port = 50000
+ 
+        self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.s.bind((host, port))
+ 
+ 
+    def getword (self,word,text):
+        if (word + ": " in text):
+            a = text.split(':')[1]
+            return a.split("'")[0]
+  
+    def run(self):
+        while 1:
+            try:
+                message, address = self.s.recvfrom(50000)
+                try:
+                    self.adresses.index(address)
+                    self.setAddr(address)                        
+                except (ValueError):
+                    self.adresses.append(address)
+ 
+                for item in message.split("\n"):
+                    if (self.getword("cpu", item) != None):
+                        self.cpu = self.getword("cpu", item)
+ 
+                for item in message.split("\n"):
+                    if (self.getword("ram", item) != None):
+                        self.ram = self.getword("ram", item)
+ 
+                for item in message.split("\n"):
+                    if (self.getword("cpu-reaper", item) != None):
+                        self.cpureaper = self.getword("cpu-reaper", item)
+ 
+                for item in message.split("\n"):
+                    if (self.getword("ram-reaper", item) != None):
+                        self.ramreaper = self.getword("ram-reaper", item)
+ 
+                for item in message.split("\n"):
+                    if (self.getword("cores", item) != None):
+                        self.cores = self.getword("cores", item)                                        
+ 
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except:
+                traceback.print_exc()
+ 
+    def setAddr(self, naddr):
+        self.addr = naddr
+ 
+    def getAddr(self):
+        return self.addr
+ 
+    def getCpu(self):
+        return self.cpu
+ 
+    def getRam(self):
+        return self.ram
+ 
+    def getCpuReaper(self):
+        return self.cpureaper
+ 
+    def getRamReaper(self):
+        return self.ramreaper
+ 
+    def getCores(self):
+        return self.cores
+\end{lstlisting}
+\section{Bronnen}
+\subsection{Websites}
+\begin{itemize}
+	\item \url{www.reaper.fm}
+	\item \url{www.forum.cockos.com}
+	\item \url{www.standingwaterstudios.com}
+	\item \url{www.reaperblog.net}
+	\item \url{www.homerecordingshow.com}
+	\item \url{www.cisco.com}
+	\item \url{www.fedoraproject.org}
+	\item \url{www.ubuntu.com}
+	\item \url{www.damnsmalllinux.org}
+	\item \url{www.partedmagic.com}
+	\item \url{www.stackoverflow.com}
+	\item \url{www.debian.org}
+	\item \url{www.debianhelp.co.uk}
+	\item \url{www.wikipedia.org}
+	\item \url{www.kegel.com}
+	\item \url{www.linux-sxs.org}
+	\item \url{www.ubuntu-tutorials.com}
+	\item \url{www.stdout.org/~winston/latex}
+	\item \url{www.howtoforge.com}
+	\item \url{www.cyberciti.biz}
+	\item \url{www.digitalherpes.wordpress.com}
+	\item \url{www.symantec.com}
+	\item \url{github.com/certik/python-2.7/blob/master/Demo/sockets}
+	\item \url{code.google.com/p/psutil}
+	\item \url{msdn.microsoft.com/en-us/library/windows/desktop}
+	\item \url{forums.techguy.org}
+	\item \url{www.askubuntu.com}
+	\item \url{www.ubuntuforums.org}
+	\item \url{www.stackoverflow.com}
+	\item \url{www.effbot.org}
+	\item \url{www.academicdownload.com}
+	\item \url{www.daniweb.com/software-development/python}
+	\item \url{www.python-course.eu}
+	\item \url{www.pydev.org}
+	\item \url{www.tutorialspoint.com/python}
+	\item \url{www.wellho.net}
+	\item \url{www.saltycrane.com}
+	\item \url{www.serverfault.com}
+	\item \url{www.advancedinstaller.com}
+	\item \url{www.emcosoftware.com}
+	\item \url{www.dennisbareis.com}
+	\item \url{wix.tramontana.co.hu}
+	\item \url{wix.sourceforge.net}
+	\item \url{wix.codeplex.com}
+	\item \url{technet.microsoft.com}
+	\item \url{www.superuser.com}
+	\item \url{discussion.dreamhost.com}
+	\item \url{http://www.ss64.com}
+	\item \url{http://curl.haxx.se}
+	\item \url{http://docs.python.org}
+	\item \url{http://uk.answers.yahoo.com}
+	\item \url{http://wiki.python.org/moin/TkInter}
+\end{itemize}
+\subsection{Personen}
+\begin{itemize}
+	\item Jasper Piens
+	\item Koen Wilms
+	\item Pieter Geens
+	\item Hans Maes
+	\item Gerben Dierick
+\end{itemize}
+\end{document}
